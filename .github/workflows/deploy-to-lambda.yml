@@ -13,13 +13,25 @@ jobs:
     steps:
     - name: Git clone the repository
       uses: actions/checkout@v3
+    - name: Setup Python
+      uses: actions/setup-python@v5.3.0
+      with:
+        python-version: 3.13
+    - name: Setup AWS SAM CLI
+      uses: aws-actions/setup-sam@v2
+      with:
+        python: 3.13
+        use-installer: false
     - name: "Configure AWS Credentials"
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-region: ${{ secrets.AWS_REGION }}
         role-to-assume: ${{ secrets.ROLE_ARN }}
         role-session-name: 'oidc-lambda'
-    - name: "Verify connection"
+    - name: "Build application stack using SAM CLI"
+      env:
+          REGION: ${{ secrets.AWS_REGION }}
       run: |
-        aws sts get-caller-identity
+        sam build --use-container
+        sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name recipe-app --capabilities CAPABILITY_IAM --region $REGION 
         
