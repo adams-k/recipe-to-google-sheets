@@ -2,6 +2,9 @@ name: Deploy Serverless App
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+    - main
 
 env:
   REGION: ${{ secrets.AWS_REGION }}
@@ -29,7 +32,7 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
         role-to-assume: ${{ secrets.ROLE_ARN }}
         role-session-name: 'oidc-lambda'
-    - name: "Build application stack using SAM CLI"
+    - name: "Build and deploy application using SAM CLI"
       env:
           REGION: ${{ secrets.AWS_REGION }}
           BUCKET: ${{ secrets.S3_BUCKET }}
