@@ -19,9 +19,6 @@ jobs:
         python-version: 3.13
     - name: Setup AWS SAM CLI
       uses: aws-actions/setup-sam@v2
-      with:
-        python: 3.13
-        use-installer: false
     - name: "Configure AWS Credentials"
       uses: aws-actions/configure-aws-credentials@v4
       with:
