@@ -3,10 +3,6 @@ name: Deploy to Lambda
 on:
   workflow_dispatch:
 
-env:
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  ROLE_ARN: ${{ secrets.ROLE_ARN }}
-
 permissions:
       id-token: write
       contents: read
@@ -20,8 +16,8 @@ jobs:
     - name: "Configure AWS Credentials"
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-region: AWS_REGION
-        role-to-assume: ROLE_ARN
+        aws-region: ${{ secrets.AWS_REGION }}
+        role-to-assume: ${{ secrets.ROLE_ARN }}
         role-session-name: 'oidc-lambda'
     - name: "Verify connection"
       run: |
