@@ -28,7 +28,8 @@ jobs:
     - name: "Build application stack using SAM CLI"
       env:
           REGION: ${{ secrets.AWS_REGION }}
+          BUCKET: ${{ secrets.S3_BUCKET }}
       run: |
         sam build --use-container
-        sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name recipe-app --capabilities CAPABILITY_IAM --region $REGION 
+        sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name recipe-app --s3-bucket $BUCKET --capabilities CAPABILITY_IAM --region $REGION 
         
