@@ -1,0 +1,29 @@
+name: Deploy to Lambda
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ROLE_ARN: ${{ secrets.ROLE_ARN }}
+
+permissions:
+      id-token: write
+      contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Git clone the repository
+      uses: actions/checkout@v3
+    - name: "Configure AWS Credentials"
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: AWS_REGION
+        role-to-assume: ROLE_ARN
+        role-session-name: 'oidc-lambda'
+    - name: "Verify connection"
+      run: |
+        aws sts get-caller-identity
+        
