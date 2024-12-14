@@ -3,12 +3,9 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   recipe-app
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
-
-    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
       LogFormat: JSON
 Resources:
@@ -18,8 +15,45 @@ Resources:
       StageName: Prod
       Auth:
         ApiKeyRequired: true
+  
+  ApiKey: 
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn: 
+      - ApiUsagePlan
+    Properties: 
+      Name: !Join ["", [{"Ref": "AWS::StackName"}, "-apikey"]]
+      Description: "CloudFormation API Key V1"
+      Enabled: true
+      GenerateDistinctId: false
+      StageKeys:
+        - RestApiId: !Ref RecipeApi
+          StageName: Prod
+
+  ApiUsagePlan:
+    Type: "AWS::ApiGateway::UsagePlan"
+    DependsOn:
+      - RecipeApiProdStage
+    Properties:
+      ApiStages: 
+        - ApiId: !Ref RecipeApi
+          Stage: Prod
+      Description: !Join [" ", [{"Ref": "AWS::StackName"}, "usage plan"]]
+      Quota:
+        Limit: 100
+        Period: MONTH
+      UsagePlanName: !Join ["", [{"Ref": "AWS::StackName"}, "-usage-plan"]]
+
+  ApiUsagePlanKey:
+    Type: "AWS::ApiGateway::UsagePlanKey"
+    DependsOn: 
+      - RecipeApi
+    Properties:
+      KeyId: !Ref ApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref ApiUsagePlan
+
   RecipeFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
@@ -28,7 +62,7 @@ Resources:
       - x86_64
       Events:
         RecipeApiKey:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             RestApiId: !Ref RecipeApi
             Path: /recipe
