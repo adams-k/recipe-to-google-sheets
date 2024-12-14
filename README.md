@@ -1,1 +1,1 @@
-# recipe-to-google-sheets
+# Serverless Recipe to Google Spreadsheet App
