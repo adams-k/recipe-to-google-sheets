@@ -1,0 +1,138 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Transform": "AWS::Serverless-2016-10-31",
+    "Description": "Managed Stack for AWS SAM CLI",
+    "Metadata": {
+      "SamCliInfo": {
+        "version": "1.132.0",
+        "installationId": "4dc8c771-6a07-45dc-b99c-5e61e37e4be4"
+      }
+    },
+    "Resources": {
+      "SamCliSourceBucket": {
+        "Type": "AWS::S3::Bucket",
+        "Properties": {
+          "PublicAccessBlockConfiguration": {
+            "BlockPublicPolicy": "true",
+            "BlockPublicAcls": "true",
+            "IgnorePublicAcls": "true",
+            "RestrictPublicBuckets": "true"
+          },
+          "BucketEncryption": {
+            "ServerSideEncryptionConfiguration": [
+              {
+                "ServerSideEncryptionByDefault": {
+                  "SSEAlgorithm": "aws:kms"
+                }
+              }
+            ]
+          },
+          "VersioningConfiguration": {
+            "Status": "Enabled"
+          },
+          "Tags": [
+            {
+              "Key": "ManagedStackSource",
+              "Value": "AwsSamCli"
+            }
+          ]
+        }
+      },
+      "SamCliSourceBucketBucketPolicy": {
+        "Type": "AWS::S3::BucketPolicy",
+        "Properties": {
+          "Bucket": {
+            "Ref": "SamCliSourceBucket"
+          },
+          "PolicyDocument": {
+            "Statement": [
+              {
+                "Action": [
+                  "s3:GetObject"
+                ],
+                "Effect": "Allow",
+                "Resource": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "SamCliSourceBucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                "Principal": {
+                  "Service": "serverlessrepo.amazonaws.com"
+                },
+                "Condition": {
+                  "StringEquals": {
+                    "aws:SourceAccount": {
+                      "Ref": "AWS::AccountId"
+                    }
+                  }
+                }
+              },
+              {
+                "Action": [
+                  "s3:*"
+                ],
+                "Effect": "Deny",
+                "Resource": [
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":s3:::",
+                        {
+                          "Ref": "SamCliSourceBucket"
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":s3:::",
+                        {
+                          "Ref": "SamCliSourceBucket"
+                        },
+                        "/*"
+                      ]
+                    ]
+                  }
+                ],
+                "Principal": "*",
+                "Condition": {
+                  "Bool": {
+                    "aws:SecureTransport": "false"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "Outputs": {
+      "SourceBucket": {
+        "Value": {
+          "Ref": "SamCliSourceBucket"
+        }
+      }
+    }
+  }
