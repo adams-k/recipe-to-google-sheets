@@ -1,6 +1,6 @@
 # Serverless Recipe Scraper API
 
-[![CI](https://github.com/adams-k/recipe-to-google-sheets/actions/workflows/sam-ci.yml/badge.svg)][![CD](https://github.com/adams-k/recipe-to-google-sheets/actions/workflows/sam-cd.yml/badge.svg)]
+![CI](https://github.com/adams-k/recipe-to-google-sheets/actions/workflows/sam-ci.yml/badge.svg)![CD](https://github.com/adams-k/recipe-to-google-sheets/actions/workflows/sam-cd.yml/badge.svg)
 
 ## About
 
